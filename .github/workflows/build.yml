@@ -1,0 +1,22 @@
+name: Build Arduino MetaAI
+on: [push]
+jobs:
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: arduino/arduino-ide
+      - name: Copy MetaAI features
+        run: |
+          mkdir arduino-ide-extension\src\browser\metaai
+          xcopy src\metaai arduino-ide-extension\src\browser\metaai /E /I
+      - uses: actions/setup-node@v4
+        with: { node-version: 18 }
+      - run: yarn install
+      - run: yarn build
+      - run: yarn electron-builder --win nsis
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Arduino-IDE-MetaAI-Win
+          path: dist/*.exe
